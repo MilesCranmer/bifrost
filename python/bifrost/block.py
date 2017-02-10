@@ -465,6 +465,7 @@ class FFTBlock(TransformBlock):
             self.shape = header['frame_shape']
         header['nbit'] = 64
         header['dtype'] = str(np.complex64)
+        header['shape'] = self.shape
         self.output_header = json.dumps(header)
     def main(self, input_rings, output_rings):
         """
