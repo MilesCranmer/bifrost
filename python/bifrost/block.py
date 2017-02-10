@@ -608,6 +608,7 @@ class SigprocReadBlock(SourceBlock):
             ifile.read_header()
             ohdr = {}
             ohdr['frame_shape'] = (ifile.nchans, ifile.nifs)
+            ohdr['shape'] = (ifile.nchans, ifile.nifs)
             ohdr['frame_size'] = ifile.nchans*ifile.nifs
             ohdr['frame_nbyte'] = ifile.nchans*ifile.nifs*ifile.nbits/8
             ohdr['frame_axes'] = ('pol', 'chan')
