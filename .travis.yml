@@ -9,6 +9,8 @@ services:
     - docker
 
 install:
+    - sudo apt-get install exuberant-ctags
+    - sudo pip install numpy contextlib2 pint
     - make docker-cpu
     
 script:
