@@ -267,9 +267,17 @@ class TestFFTBlock(unittest.TestCase):
         self.assertAlmostEqual(number_fftd, 2*number_copied)
     def test_data_sizes(self):
         """Test that different number of bits give correct throughput size"""
+        self.number_fftd = 0
+        self.number_copied = 0
+
+        def set_numberfftd(fft_result):
+            """Set the number of fft'd elements"""
+            self.number_fftd = fft_result.size
+        def set_numbercopied(fft_result):
+            """Set the number of copied elements"""
+            self.number_copied = fft_result.size
+
         for iterate in range(3):
-            self.number_fftd = 0
-            self.number_copied = 0
             nbit = 2**iterate
 
             self.blocks[0] = (
@@ -277,18 +285,14 @@ class TestFFTBlock(unittest.TestCase):
                     './data/2chan'+ str(nbit) + 'bitNoDM.fil'),
                 [], [0])
 
-            def assert_numberfftd(fft_result):
-                self.number_fftd = fft_result.size
 
-            self.blocks[2] = (NumpyBlock(assert_numberfftd, outputs=0), {'in_1':1})
+
+            self.blocks[2] = (NumpyBlock(set_numberfftd, outputs=0), {'in_1':1})
 
             Pipeline(self.blocks).main()
             self.blocks[1] = (NumpyBlock(np.copy), {'in_1':0, 'out_1':1})
 
-            def assert_numbercopied(fft_result):
-                self.number_copied = fft_result.size
-
-            self.blocks[2] = (NumpyBlock(assert_numbercopied, outputs=0), {'in_1':1})
+            self.blocks[2] = (NumpyBlock(set_numbercopied, outputs=0), {'in_1':1})
             Pipeline(self.blocks).main()
 
             self.assertEqual(self.number_fftd, self.number_copied)
