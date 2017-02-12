@@ -267,35 +267,24 @@ class TestFFTBlock(unittest.TestCase):
         self.assertAlmostEqual(number_fftd, 2*number_copied)
     def test_data_sizes(self):
         """Test that different number of bits give correct throughput size"""
-        for iterate in range(5):
+        for iterate in range(3):
             self.number_fftd = 0
             self.number_copied = 0
             nbit = 2**iterate
-            if nbit == 8:
-                continue
+
             self.blocks[0] = (
                 SigprocReadBlock(
                     './data/2chan'+ str(nbit) + 'bitNoDM.fil'),
                 [], [0])
 
-            if iterate == 4:
-                self.blocks[0] = (
-                    SigprocReadBlock(
-                        './data/2chan'+ str(2) + 'bitNoDM.fil'),
-                    [], [0])
-
             def assert_numberfftd(fft_result):
                 self.number_fftd = fft_result.size
 
             self.blocks[2] = (NumpyBlock(assert_numberfftd, outputs=0), {'in_1':1})
-            #open(self.logfile, 'w').close()
+
             Pipeline(self.blocks).main()
-            #number_fftd = np.loadtxt(self.logfile).astype(np.float32).view(np.complex64).size
-            # Compare with simple copy
             self.blocks[1] = (NumpyBlock(np.copy), {'in_1':0, 'out_1':1})
-            #self.blocks[1] = (CopyBlock(), [0], [1])
-            #open(self.logfile, 'w').close()
-            #number_copied = np.loadtxt(self.logfile).size
+
             def assert_numbercopied(fft_result):
                 self.number_copied = fft_result.size
 
