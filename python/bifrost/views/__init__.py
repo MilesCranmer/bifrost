@@ -26,22 +26,4 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pint
-
-ureg = pint.UnitRegistry()
-
-def convert_units(value, old_units, new_units):
-	old_quantity = value * ureg.parse_expression(old_units)
-	try:
-		new_quantity = old_quantity.to(new_units)
-	except pint.DimensionalityError:
-		raise ValueError("Cannot convert units %s to %s" %
-		                 (old_units, new_units))
-	return new_quantity.magnitude
-
-# TODO: May need something more flexible, like a Units wrapper class with __str__
-def transform_units(units, exponent):
-	old_quantity = ureg.parse_expression(units)
-	new_quantity = old_quantity**exponent
-	new_units_str = '{:P~}'.format(new_quantity.units)
-	return new_units_str
+from .basic_views import astype, split_axis, merge_axes

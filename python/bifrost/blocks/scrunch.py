@@ -28,7 +28,9 @@
 
 # TODO: This is a bit hacky and inflexible, and has no CUDA backend yet
 
-from pipeline import TransformBlock
+from __future__ import absolute_import
+
+from bifrost.pipeline import TransformBlock
 
 from copy import deepcopy
 
@@ -54,8 +56,9 @@ class ScrunchBlock(TransformBlock):
 		in_nframe = ispan.nframe
 		out_nframe = in_nframe // self.factor
 		idata = ispan.data
-		ospan.data[...] = idata.reshape((out_nframe,self.factor)+idata.shape[1:]).mean(axis=1)
+		odata = ospan.data
+		odata[...] = idata.reshape((out_nframe,self.factor)+idata.shape[1:]).mean(axis=1, dtype=odata.dtype)
 		return out_nframe
 
 def scrunch(iring, factor, *args, **kwargs):
-	return ScrunchBlock(iring, factor, *args, **kwargs).orings[0]
+	return ScrunchBlock(iring, factor, *args, **kwargs)

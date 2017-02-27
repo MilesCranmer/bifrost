@@ -20,7 +20,8 @@ $(BIFROST_PYTHON_VERSION_FILE): config.mk
 	@echo "__version__ = \"$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR).$(LIBBIFROST_PATCH)\"" > $@
 
 test:
-	$(MAKE) -C $(SRC_DIR) test
+	#$(MAKE) -C $(SRC_DIR) test
+	cd test && python -m unittest discover
 .PHONY: test
 clean:
 	$(MAKE) -C $(BIFROST_PYTHON_DIR) clean || true
@@ -48,13 +49,13 @@ python:
 #GPU Docker build
 IMAGE_NAME ?= ledatelescope/bifrost
 docker:
-	docker build -t $(IMAGE_NAME):$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR) -f Dockerfile.gpu -t $(IMAGE_NAME) .
+	docker build --pull -t $(IMAGE_NAME):$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR) -f Dockerfile.gpu -t $(IMAGE_NAME) .
 .PHONY: docker
 
 #CPU-only Docker build
 IMAGE_NAME ?= ledatelescope/bifrost
 docker-cpu:
-	docker build -t $(IMAGE_NAME):$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR) -f Dockerfile.cpu -t $(IMAGE_NAME) .
+	docker build --pull -t $(IMAGE_NAME):$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR) -f Dockerfile.cpu -t $(IMAGE_NAME) .
 .PHONY: docker
 
 # TODO: Consider adding a mode 'develop=1' that makes symlinks instead of copying

@@ -26,22 +26,54 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import pint
+"""
+A simple block that accepts 1 frame at a time and accumulates them
+nframe times before outputting the accumulated result.
+"""
 
-ureg = pint.UnitRegistry()
+from __future__ import absolute_import
 
-def convert_units(value, old_units, new_units):
-	old_quantity = value * ureg.parse_expression(old_units)
-	try:
-		new_quantity = old_quantity.to(new_units)
-	except pint.DimensionalityError:
-		raise ValueError("Cannot convert units %s to %s" %
-		                 (old_units, new_units))
-	return new_quantity.magnitude
+import bifrost as bf
+from bifrost.pipeline import TransformBlock
 
-# TODO: May need something more flexible, like a Units wrapper class with __str__
-def transform_units(units, exponent):
-	old_quantity = ureg.parse_expression(units)
-	new_quantity = old_quantity**exponent
-	new_units_str = '{:P~}'.format(new_quantity.units)
-	return new_units_str
+from copy import deepcopy
+
+class AccumulateBlock(TransformBlock):
+	def __init__(self, iring, nframe, dtype=None, gulp_nframe=1,
+	             *args, **kwargs):
+		assert(gulp_nframe == 1)
+		super(AccumulateBlock, self).__init__(iring, gulp_nframe=1,
+		                                      *args, **kwargs)
+		self.nframe = nframe
+		self.dtype  = dtype
+	def define_valid_input_spaces(self):
+		"""Return set of valid spaces (or 'any') for each input"""
+		return ('cuda',)
+	def on_sequence(self, iseq):
+		ihdr = iseq.header
+		itensor = ihdr['_tensor']
+		ohdr = deepcopy(ihdr)
+		otensor = ohdr['_tensor']
+		if 'scales' in otensor:
+			frame_axis = otensor['shape'].index(-1)
+			otensor['scales'][frame_axis][1] *= self.nframe
+		if self.dtype is not None:
+			otensor['dtype'] = self.dtype
+		self.frame_count = 0
+		return ohdr
+	def on_data(self, ispan, ospan):
+		print "accumulate::on_data", ispan.data.shape, ospan.data.shape
+		idata = ispan.data
+		odata = ospan.data
+		beta = 0. if self.frame_count == 0 else 1.
+		bf.map("b = beta * b + (b_type)a", a=idata, b=odata, beta=beta)
+		self.frame_count += 1
+		if self.frame_count == self.nframe:
+			ncommit = 1
+			self.frame_count = 0
+		else:
+			ncommit = 0
+		return ncommit
+
+def accumulate(iring, nframe, *args, **kwargs):
+	return AccumulateBlock(iring, nframe, *args, **kwargs)
