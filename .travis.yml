@@ -10,6 +10,10 @@ install:
     - cd
     - sudo apt-get update
     - sudo apt-get install exuberant-ctags -y
+    - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - sudo apt-get -qqy update
+    - sudo apt-get -qqy install g++-4.9
+    - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
     - sudo pip install numpy matplotlib contextlib2 pint
     - git clone https://github.com/MatthieuDartiailh/pyclibrary
     - cd pyclibrary
