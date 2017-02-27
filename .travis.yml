@@ -5,14 +5,9 @@ language: python
 python:
     - "2.7"
 
-services:
-    - docker
-
 install:
     - export BIFROST_DIR=$(pwd)
     - cd
-    - ls
-    - pwd
     - sudo apt-get update
     - sudo apt-get install exuberant-ctags -y
     - sudo pip install numpy matplotlib contextlib2 pint
@@ -22,11 +17,11 @@ install:
     - cd $BIFROST_DIR
     - NOCUDA=1 make
     - sudo make install 
-    - sudo find / -name "libbifrost.so"
     - export LD_LIBRARY_PATH=$(pwd)/lib/:/usr/local/lib
     - echo $LD_LIBRARY_PATH
     - cd ..
     
 script:
     - cd bifrost/test 
-    - sh ./travis.sh
+    - sh ./download_test_data.sh
+    - python -m unittest test_block test_sigproc test_resizing test_quantize test_unpack
