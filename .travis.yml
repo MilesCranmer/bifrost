@@ -23,8 +23,9 @@ install:
     - git clone https://github.com/ledatelescope/bifrost
     - cd bifrost
     - NOCUDA=1 make
-    - sudo make install
-    - export LD_LIBRARY_PATH=/bifrost/lib/
+    - sudo make install 
+    - sudo find / -name "libbifrost.so"
+    - export LD_LIBRARY_PATH=$(pwd)/lib/:/usr/local/lib
     - cd ..
     
 script:
