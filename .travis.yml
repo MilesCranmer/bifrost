@@ -20,6 +20,7 @@ install:
     - cd pyclibrary
     - python setup.py install
     - cd ..
+    - git clone https://github.com/ledatelescope/bifrost
     - cd bifrost
     - NOCUDA=1 make
     - sudo make install
