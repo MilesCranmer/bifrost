@@ -9,9 +9,22 @@ services:
     - docker
 
 install:
-    - sudo apt-get install exuberant-ctags
-    - sudo pip install numpy contextlib2 pint
-    - make docker-cpu
+    - apt-get update
+    - apt-get install exuberant-ctags -y
+    - add-apt-repository -y ppa:ubuntu-toolchain-r/test
+    - apt-get -qqy update
+    - apt-get -qqy install g++-4.9
+    - update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.9 60 --slave /usr/bin/g++ g++ /usr/bin/g++-4.9
+    - pip install numpy matplotlib contextlib2 pint
+    - git clone https://github.com/MatthieuDartiailh/pyclibrary
+    - cd pyclibrary
+    - python setup.py install
+    - cd /
+    - git clone https://github.com/ledatelescope/bifrost.git
+    - cd bifrost
+    - NOCUDA=1 make
+    - make install
+    - export LD_LIBRARY_PATH=/bifrost/lib/
     
 script:
-    - docker run --rm ledatelescope/bifrost /bin/sh -c "cd /bifrost/test && sh ./travis.sh"
+    - docker run --rm ledatelescope/bifrost /bin/sh -c "export LD_LIBRARY_PATH=/bifrost/lib && cd /bifrost/test && sh ./travis.sh"
