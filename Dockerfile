@@ -36,9 +36,7 @@ ENV TERM xterm
 # Build the library
 WORKDIR /bifrost
 RUN git clone https://github.com/ledatelescope/bifrost.git /bifrost && \
-    make clean && \
     make -j && \
-    make doc && \
     make install
 
 ENV LD_LIBRARY_PATH /usr/local/lib:${LD_LIBRARY_PATH}
