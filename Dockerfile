@@ -44,7 +44,6 @@ WORKDIR /bifrost
 COPY . .
 RUN make clean && \
     make -j NOCUDA=1 && \
-    make doc && \
     make install
 
 ENV LD_LIBRARY_PATH /usr/local/lib:${LD_LIBRARY_PATH}
