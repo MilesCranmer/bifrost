@@ -62,7 +62,7 @@ docker_prereq:
 #CPU-only Docker build
 IMAGE_NAME ?= ledatelescope/bifrost
 docker-cpu:
-	docker build --pull -t $(IMAGE_NAME):$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR) -f Dockerfile.cpu -t $(IMAGE_NAME) .
+	docker build --pull -t $(IMAGE_NAME):$(LIBBIFROST_MAJOR).$(LIBBIFROST_MINOR) -f Dockerfile -t $(IMAGE_NAME) .
 .PHONY: docker
 
 # TODO: Consider adding a mode 'develop=1' that makes symlinks instead of copying
